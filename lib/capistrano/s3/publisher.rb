@@ -13,7 +13,6 @@ module Capistrano
         s3 = self.establish_s3_client_connection!(region, key, secret)
         updated = false
 
-        binding.pry
 
         self.files(deployment_path_absolute, exclusions).each do |file|
           if !File.directory?(file)
