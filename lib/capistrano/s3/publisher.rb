@@ -1,6 +1,7 @@
 require 'aws-sdk'
 require 'mime/types'
 require 'fileutils'
+require 'pry'
 
 module Capistrano
   module S3
