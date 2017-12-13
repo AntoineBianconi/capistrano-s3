@@ -13,6 +13,17 @@ module Capistrano
         s3 = self.establish_s3_client_connection!(region, key, secret)
         updated = false
 
+        current_keys = []
+        resource = Aws::S3::Resource.new(client: s3)
+        bucket = resource.bucket(bucket)
+        bucket.objects.each{|obj|
+          if obj.key.last != '/' && !obj.key.include?('archives/')
+            current_keys << obj
+          end
+        }
+
+        puts current_keys
+        debugger
 
         self.files(deployment_path_absolute, exclusions).each do |file|
           if !File.directory?(file)
