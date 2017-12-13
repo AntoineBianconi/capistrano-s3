@@ -13,6 +13,8 @@ module Capistrano
         s3 = self.establish_s3_client_connection!(region, key, secret)
         updated = false
 
+        binding.pry
+
         self.files(deployment_path_absolute, exclusions).each do |file|
           if !File.directory?(file)
             next if self.published?(file, bucket, stage)
@@ -24,6 +26,8 @@ module Capistrano
             self.put_object(s3, bucket, target_path, path, file, only_gzip, extra_options)
           end
         end
+
+
 
         # invalidate CloudFront distribution if needed
         if distribution_id && !invalidations.empty?
