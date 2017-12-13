@@ -18,7 +18,7 @@ module Capistrano
         next_keys = []
         self.files(deployment_path_absolute, exclusions).each do |file|
           if !File.directory?(file)
-            next if self.published?(file, bucket, stage)
+            #next if self.published?(file, bucket, stage)
             next if only_gzip && self.has_gzipped_version?(file)
             path = self.base_file_path(deployment_path_absolute, file)
             path.gsub!(/^\//, "") # Remove preceding slash for S3
