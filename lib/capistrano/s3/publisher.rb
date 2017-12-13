@@ -17,7 +17,7 @@ module Capistrano
         resource = Aws::S3::Resource.new(client: s3)
         bucket = resource.bucket(bucket)
         bucket.objects.each{|obj|
-          if obj.key.last != '/' && !obj.key.include?('archives/')
+          if obj.key[-1] != '/' && !obj.key.include?('archives/')
             current_keys << obj
           end
         }
