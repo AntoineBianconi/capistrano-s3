@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   # Gem dependencies
   s.add_runtime_dependency 'aws-sdk',    '~> 2.6'
   s.add_runtime_dependency 'capistrano', '>= 2'
+  s.add_runtime_dependency 'pry-byebug', '>= 3.5.1'
   s.add_runtime_dependency 'mime-types'
 
   # Development dependencies

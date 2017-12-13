@@ -23,7 +23,7 @@ module Capistrano
         }
 
         puts current_keys
-        debugger
+        binding.pry
 
         self.files(deployment_path_absolute, exclusions).each do |file|
           if !File.directory?(file)
