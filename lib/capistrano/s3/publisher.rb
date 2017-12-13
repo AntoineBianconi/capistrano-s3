@@ -23,8 +23,6 @@ module Capistrano
           end
         }
 
-        binding.pry
-
         self.files(deployment_path_absolute, exclusions).each do |file|
           if !File.directory?(file)
             next if self.published?(file, bucket, stage)
