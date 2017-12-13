@@ -14,16 +14,8 @@ module Capistrano
         s3 = self.establish_s3_client_connection!(region, key, secret)
         updated = false
 
-        current_keys = []
-        resource = Aws::S3::Resource.new(client: s3)
-        s3_bucket = resource.bucket(bucket)
-        s3_bucket.objects.each{|obj|
-          if obj.key[-1] != '/' && !obj.key.include?('archives/')
-            current_keys << obj.key
-          end
-        }
-
-        binding.pry
+        current_keys = self.get_current_bucket_keys(s3, bucket)
+        next_keys = []
         self.files(deployment_path_absolute, exclusions).each do |file|
           if !File.directory?(file)
             next if self.published?(file, bucket, stage)
@@ -31,11 +23,12 @@ module Capistrano
 
             path = self.base_file_path(deployment_path_absolute, file)
             path.gsub!(/^\//, "") # Remove preceding slash for S3
+            next_keys << "#{target_path}/#{path}"
             self.put_object(s3, bucket, target_path, path, file, only_gzip, extra_options)
           end
         end
 
-
+        binding.pry
 
         # invalidate CloudFront distribution if needed
         if distribution_id && !invalidations.empty?
@@ -60,6 +53,10 @@ module Capistrano
         end
 
         self.published_to!(bucket, stage)
+      end
+
+      def self.get_current_bucket_keys(s3, bucket)
+        Aws::S3::Resource.new(client: s3).bucket(bucket).objects.map{|obj| obj.key if obj.key[-1] != '/' && !obj.key.include?('archives/')}
       end
 
       def self.clear!(region, key, secret, bucket, stage = 'default')
