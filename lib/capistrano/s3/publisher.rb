@@ -27,11 +27,14 @@ module Capistrano
           end
         end
 
-        current_keys.each{|key|
-          unless next_keys.include?(key)
-            binding.pry
+        remove_keys = current_keys.map{|key|key unless next_keys.include?(key)}
+
+        Aws::S3::Resource.new(client: s3).bucket(bucket).objects.each{|obj|
+          if obj.key[-1] != '/' && !obj.key.include?('archives/') && remove_keys.include?(obj.key)
+            obj.delete
           end
         }
+
         # invalidate CloudFront distribution if needed
         if distribution_id && !invalidations.empty?
           cf = self.establish_cf_client_connection!(region, key, secret)
