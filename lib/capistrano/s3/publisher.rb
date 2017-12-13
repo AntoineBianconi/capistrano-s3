@@ -20,7 +20,6 @@ module Capistrano
           if !File.directory?(file)
             next if self.published?(file, bucket, stage)
             next if only_gzip && self.has_gzipped_version?(file)
-
             path = self.base_file_path(deployment_path_absolute, file)
             path.gsub!(/^\//, "") # Remove preceding slash for S3
             next_keys << "#{target_path}/#{path}"
@@ -56,7 +55,7 @@ module Capistrano
       end
 
       def self.get_current_bucket_keys(s3, bucket)
-        Aws::S3::Resource.new(client: s3).bucket(bucket).objects.map{|obj| obj.key if obj.key[-1] != '/' && !obj.key.include?('archives/')}
+        Aws::S3::Resource.new(client: s3).bucket(bucket).objects.map{|obj| obj.key if obj.key[-1] != '/' && !obj.key.include?('archives/')}.compact.uniq
       end
 
       def self.clear!(region, key, secret, bucket, stage = 'default')
