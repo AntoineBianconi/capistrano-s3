@@ -16,14 +16,13 @@ module Capistrano
 
         current_keys = []
         resource = Aws::S3::Resource.new(client: s3)
-        bucket = resource.bucket(bucket)
-        bucket.objects.each{|obj|
+        s3_bucket = resource.bucket(bucket)
+        s3_bucket.objects.each{|obj|
           if obj.key[-1] != '/' && !obj.key.include?('archives/')
-            current_keys << obj
+            current_keys << obj.key
           end
         }
 
-        puts current_keys
         binding.pry
 
         self.files(deployment_path_absolute, exclusions).each do |file|
@@ -33,7 +32,7 @@ module Capistrano
 
             path = self.base_file_path(deployment_path_absolute, file)
             path.gsub!(/^\//, "") # Remove preceding slash for S3
-
+            binding.pry
             self.put_object(s3, bucket, target_path, path, file, only_gzip, extra_options)
           end
         end
