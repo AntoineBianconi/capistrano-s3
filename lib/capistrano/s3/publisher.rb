@@ -27,8 +27,11 @@ module Capistrano
           end
         end
 
-        binding.pry
-
+        current_keys.each{|key|
+          unless next_keys.include?(key)
+            binding.pry
+          end
+        }
         # invalidate CloudFront distribution if needed
         if distribution_id && !invalidations.empty?
           cf = self.establish_cf_client_connection!(region, key, secret)
