@@ -23,6 +23,7 @@ module Capistrano
           end
         }
 
+        binding.pry
         self.files(deployment_path_absolute, exclusions).each do |file|
           if !File.directory?(file)
             next if self.published?(file, bucket, stage)
@@ -30,7 +31,6 @@ module Capistrano
 
             path = self.base_file_path(deployment_path_absolute, file)
             path.gsub!(/^\//, "") # Remove preceding slash for S3
-            binding.pry
             self.put_object(s3, bucket, target_path, path, file, only_gzip, extra_options)
           end
         end
