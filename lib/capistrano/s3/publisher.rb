@@ -27,13 +27,7 @@ module Capistrano
           end
         end
 
-        remove_keys = current_keys.map{|key|key unless next_keys.include?(key)}
-
-        Aws::S3::Resource.new(client: s3).bucket(bucket).objects.each{|obj|
-          if obj.key[-1] != '/' && !obj.key.include?('archives/') && remove_keys.include?(obj.key)
-            obj.delete
-          end
-        }
+        self.remove_old_assets(s3, bucket, current_keys, next_keys)
 
         # invalidate CloudFront distribution if needed
         if distribution_id && !invalidations.empty?
@@ -62,6 +56,15 @@ module Capistrano
 
       def self.get_current_bucket_keys(s3, bucket)
         Aws::S3::Resource.new(client: s3).bucket(bucket).objects.map{|obj| obj.key if obj.key[-1] != '/' && !obj.key.include?('archives/')}.compact.uniq
+      end
+
+      def self.remove_old_assets(s3, bucket, current_keys, next_keys)
+        remove_keys = current_keys.map{|key|key unless next_keys.include?(key)}
+        Aws::S3::Resource.new(client: s3).bucket(bucket).objects.each{|obj|
+          if obj.key[-1] != '/' && !obj.key.include?('archives/') && remove_keys.include?(obj.key)
+            obj.delete
+          end
+        }
       end
 
       def self.clear!(region, key, secret, bucket, stage = 'default')
